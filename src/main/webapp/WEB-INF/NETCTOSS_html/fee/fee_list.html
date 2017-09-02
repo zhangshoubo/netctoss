@@ -1,0 +1,260 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title></title>
+    <link type="text/css" rel="stylesheet" media="all" href="../styles/global.css"/>
+    <link type="text/css" rel="stylesheet" media="all" href="../styles/global_color.css"/>
+    <script src="../js/jquery-3.2.1.js" sype="text/javascript"></script>
+
+</head>
+<body>
+<!--Logo区域开始-->
+<div id="header">
+    <img src="../images/logo.png" alt="logo" class="left"/>
+    <a href="#">[退出]</a>
+</div>
+<!--Logo区域结束-->
+<!--导航区域开始-->
+<div id="navi">
+    <ul id="menu">
+        <li><a href="../index.html" class="index_off"></a></li>
+        <li><a href="../role/role_list.html" class="role_off"></a></li>
+        <li><a href="../admin/admin_list.html" class="admin_off"></a></li>
+        <li><a href="../fee/fee_list.html" class="fee_on"></a></li>
+        <li><a href="../account/account_list.html" class="account_off"></a></li>
+        <li><a href="../service/service_list.html" class="service_off"></a></li>
+        <li><a href="../bill/bill_list.html" class="bill_off"></a></li>
+        <li><a href="../report/report_list.html" class="report_off"></a></li>
+        <li><a href="../user/user_info.html" class="information_off"></a></li>
+        <li><a href="../user/user_modi_pwd.html" class="password_off"></a></li>
+    </ul>
+</div>
+<!--导航区域结束-->
+<!--主要区域开始-->
+<div id="main">
+    <form action="" method="">
+        <!--排序-->
+        <div class="search_add">
+            <div>
+                <!--<input type="button" value="月租" class="sort_asc" onclick="sort(this);" />-->
+                <input type="button" value="基费" class="sort_asc" onclick="sort(this);"/>
+                <input type="button" value="时长" class="sort_asc" onclick="sort(this);"/>
+            </div>
+            <input type="button" value="增加" class="btn_add" onclick="location.href='/fee_add.html';"/>
+            <!--<input type="button" value="增加" class="btn_add" id="fee_add"/>-->
+        </div>
+        <!--启用操作的操作提示-->
+        <div id="operate_result_info" class="operate_success">
+            <img src="../images/close.png" onclick="this.parentNode.style.display='none';"/>
+            删除成功！
+        </div>
+        <!--数据区域：用表格展示数据-->
+        <div id="data">
+            <table id="datalist">
+            </table>
+            <p>业务说明：<br/>
+                1、创建资费时，状态为暂停，记载创建时间；<br/>
+                2、暂停状态下，可修改，可删除；<br/>
+                3、开通后，记载开通时间，且开通后不能修改、不能再停用、也不能删除；<br/>
+                4、业务账号修改资费时，在下月底统一触发，修改其关联的资费ID（此触发动作由程序处理）
+            </p>
+        </div>
+        <!--分页-->
+        <div id="pages">
+            <!--<a href="#">上一页</a>-->
+            <!--<a href="#" class="current_page">1</a>-->
+            <!--<a href="#">2</a>-->
+            <!--<a href="#">3</a>-->
+            <!--<a href="#">4</a>-->
+            <!--<a href="#">5</a>-->
+            <!--<a href="#">下一页</a>-->
+        </div>
+    </form>
+</div>
+<!--主要区域结束-->
+<div id="footer">
+    <p>[源自北美的技术，最优秀的师资，最真实的企业环境，最适用的实战项目]</p>
+    <p>版权所有(C)云科技有限公司</p>
+</div>
+</body>
+<script language="javascript" type="text/javascript">
+    window.onload = function () {
+        //排序按钮的点击事件
+        function sort(btnObj) {
+            if (btnObj.className == "sort_desc")
+                btnObj.className = "sort_asc";
+            else
+                btnObj.className = "sort_desc";
+        }
+
+        //启用
+        function startFee() {
+            var r = window.confirm("确定要启用此资费吗？资费启用后将不能修改和删除。");
+            document.getElementById("operate_result_info").style.display = "block";
+        }
+
+//            //删除
+//           $("#deleteFee").click(function () {
+//
+//                var r = window.confirm("确定要删除此资费吗？");
+//                document.getElementById("operate_result_info").style.display = "block";
+//               $.ajax({
+//                    url:"/delete",
+//                    type:"get",
+//                   data:{
+//                       delete_id: $(this).attr("delete_id")
+//                   }
+//               })
+//               });
+        function delete1() {
+            var r = window.confirm("确定要删除此资费吗？");
+            $.post({
+                url:"/deleteFee",
+                type:"get",
+                data:{
+                    detail_id: $(this).attr("delete_id")
+                },
+                success:function (result) {
+                    console.log(result.did)
+                    $("#ss"+result.did).remove();
+                }
+
+            });
+            document.getElementById("operate_result_info").style.display = "block";
+        }
+
+//                    修改
+        function modiFee() {
+
+            var id = $(this).attr("cost_id");
+            window.location.href = '/fee_modi?cost_id=' + id;
+        }
+
+        function detail() {
+            var id = $(this).attr("detail_id");
+            location.href = 'fee_detail.html?detail_id=' + id;
+        }
+
+
+        function findAllFee(pageNum, pageSize) {
+            $.ajax({
+                url: "/findAllPageFee",
+                type: "get",
+                data: {
+                    pageNum: pageNum,
+                    pageSize: pageSize
+                },
+                success: function (result) {
+                    console.log(result);
+                    $("#datalist").html("");
+                    $("#pages").html("");
+                    showpage(result);
+                    showCostth();
+                    for (var i = 0; i < result.list.length; i++) {
+                        var list = result.list;
+                        showCost(list[i].cost_id, list[i].base_duration, list[i].name,
+                            list[i].base_cost, list[i].unit_cost, list[i].creatime,
+                            list[i].startime, list[i].status)
+                    }
+                }
+            })
+        }
+        //更改状态
+        function updatestauts() {
+            var id = $(this).attr("cost_id");
+            alert(id);
+            $.ajax({
+                url:"/updateStatus",
+                data:{
+                    id:id
+                },
+                success:function (result) {
+                    console.log(result);
+
+                }
+
+
+
+
+            })
+
+
+
+
+        }
+
+        function newfunc() {
+            var num = $(this).attr("nameid");
+            findAllFee(num, 3)
+        }
+
+        function showpage(result) {
+//                上一页
+            var prePagefalse = $("<p></p></li>").html("上一页");
+            var prePagetrue = $("<a href='#'></a>").html("上一页").click(function () {
+                findAllFee(result.prePage, 3)
+            });
+            var prePage = result.hasPreviousPage ? prePagetrue : prePagefalse;
+            $("#pages").append(prePage);
+//             中间显示页
+            var pages = result.pages;
+            for (var i = 1; i <= pages; i++) {
+                var pageNumTrue = $("<a href='#' class='current_page'>" + i + "</a>")
+                var pageNumFalse = $("<a href='#'>" + i + "</a>").click(newfunc).attr("nameid", i);
+                var pageNum = result.pageNum == i ? pageNumTrue : pageNumFalse;
+                $("#pages").append(pageNum)
+            }
+//                下一页
+            var nextPagefalse = $("<p></p>").html("下一页");
+            var nextPagetrue = $("<a href='#'></a>").html("下一页").click(function () {
+                findAllFee(result.nextPage, 3)
+            })
+            var nextPage = result.hasNextPage ? nextPagetrue : nextPagefalse;
+            $("#pages").append(nextPage)
+        }
+
+        function showCostth() {
+            var firtr1 = $("<tr></tr>")
+            var firth1 = $("<th></th>").html("资费ID")
+            var firth2 = $("<th class='width100'></th>").html("资费名称")
+            var firth3= $("<th></th>").html("基本时长")
+            var firth4 = $("<th></th>").html("基本费用")
+            var firth5 = $("<th></th>").html("单位费用")
+            var firth6 = $("<th></th>").html("创建时间")
+            var firth7 = $("<th></th>").html("开通时间")
+            var firth8 = $("<th class='width50'></th>").html("状态")
+            var firth9 = $("<th class='width200'></th>")
+            firtr1.append(firth1).append(firth2).append(firth3).append(firth4).append(firth5).append(firth6).append(firth7).append(firth8).append(firth9);
+            $("#datalist").append(firtr1)
+        }
+
+
+        function showCost(id, name, duration, base_cost, unit_cost, creatime, startime, status) {
+            var firtr2 = $("<tr></tr>");
+            var firtd1 = $("<td></td>").html(id);
+            var firtd2 = $("<td></td>");
+            var firtd3 = $("<td></td>").html(name);
+            var firtd4 = $("<td></td>").html(base_cost);
+            var firtd5 = $("<td></td>").html(unit_cost);
+            var firtd6 = $("<td></td>").html(creatime == 0 | creatime == null ? "" : new Date(parseInt(creatime)).toLocaleString());
+            var firtd7 = $("<td></td>").html(startime == 0 | startime == null ? "" : new Date(parseInt(startime)).toLocaleString());
+            var firtd8 = $("<td></td>").html(status);
+            var firtd9 = $("<td></td>");
+            var fira = $("<a href='#'></a>").html(duration).attr("detail_id", id).click(detail)
+            fira.appendTo(firtd2);
+            $("<input type='button' value='启用' class='btn_start'/>").appendTo(firtd9).attr("cost_id",id).click(updatestauts)
+            $("<input type='button' value='修改' class='btn_modify'/>").appendTo(firtd9).attr("cost_id", id).click(modiFee);
+            $("<input type='button' value='删除' id='deleteFee' class='btn_delete'/>").appendTo(firtd9).attr("delete_id", id).click(delete1);
+            firtr2.append(firtd1).append(firtd2).append(firtd3).append(firtd4).append(firtd5).append(firtd6).append(firtd7).append(firtd8).append(firtd9);
+            firtr2.attr("id","ss"+id);
+            $("#datalist").append(firtr2)
+        }
+
+        findAllFee(1, 3);
+    }
+</script>
+
+
+</html>
