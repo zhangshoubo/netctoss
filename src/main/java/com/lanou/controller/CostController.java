@@ -47,9 +47,9 @@ public class CostController {
     @ResponseBody
     public PageInfo<Cost> findAllPageFee(@RequestParam("pageNum") Integer pageNum, @RequestParam("pageSize") Integer pageSize) {
         PageInfo<Cost> pageFee = costService.findAllPageFee(pageNum, pageSize);
+        System.out.println("11111111");
         return pageFee;
     }
-
 
     @RequestMapping(value = "fee_add.html")
     public String fee_add() {
