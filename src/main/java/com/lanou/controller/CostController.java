@@ -51,7 +51,7 @@ public class CostController {
         return pageFee;
     }
 
-    @RequestMapping(value = "fee_add.html")
+    @RequestMapping(value = "/fee_add")
     public String fee_add() {
         return "fee/fee_add";
     }
@@ -62,12 +62,12 @@ public class CostController {
     }
 
 
-    @RequestMapping(value = "fee/feeAddCost")
+    @RequestMapping(value = "/feeAddCost")
     public String feeAddCost(Cost cost) {
         cost.setStatus("1");
         cost.setCreatime(new Timestamp(System.currentTimeMillis()));
         costService.insertCost(cost);
-        return "redirect:fee_list.html";
+        return "redirect:fee/fee_list.html";
     }
 
     @RequestMapping(value = "/fee_modi")
@@ -76,7 +76,6 @@ public class CostController {
         session.setAttribute("cost", cost);
         return "fee/fee_modi";
     }
-
     @RequestMapping(value = "/showcost")
     @ResponseBody
     public Map<String,Object> showId(HttpSession session ){
@@ -85,39 +84,25 @@ public class CostController {
         map.put("showcost",cost);
         return map;
     }
-
-
-
-
     @RequestMapping(value = "/modi")
     public String modi(Cost cost) {
         System.out.println(cost);
         costService.updateCost(cost);
         return "redirect:/fee/fee_list";
-
     }
     @RequestMapping(value = "/updateStatus")
     @ResponseBody
     public String updateStatus(@RequestParam("id") Integer id){
          costService.updateStatus(id);
-
         return null;
 
     }
-
-
-
-
-
-
     @RequestMapping(value = "fee/fee_detail.html")
     public String   detail( @RequestParam(value = "detail_id") Integer id, HttpSession session) {
         Cost cost = costService.findById(id);
         session.setAttribute("detail_id", cost);
         return "fee/fee_detail";
     }
-
-//    个人自费名称页面fee_detail.html，走这个方法显示页面上的数据
     @RequestMapping(value = "/fee_detail")
     @ResponseBody
     public Map<String,Object> showdetail(HttpSession session) {
