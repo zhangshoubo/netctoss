@@ -47,7 +47,6 @@ public class CostController {
     @ResponseBody
     public PageInfo<Cost> findAllPageFee(@RequestParam("pageNum") Integer pageNum, @RequestParam("pageSize") Integer pageSize) {
         PageInfo<Cost> pageFee = costService.findAllPageFee(pageNum, pageSize);
-        System.out.println("11111111");
         return pageFee;
     }
 
@@ -94,8 +93,8 @@ public class CostController {
     @ResponseBody
     public String updateStatus(@RequestParam("id") Integer id){
          costService.updateStatus(id);
-        return null;
-
+        Cost cost = costService.checkStatus(id);
+        return cost.getStatus();
     }
     @RequestMapping(value = "fee/fee_detail")
     public String   detail( @RequestParam(value = "detail_id") Integer id, HttpSession session) {
