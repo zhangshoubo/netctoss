@@ -97,7 +97,7 @@ public class CostController {
         return null;
 
     }
-    @RequestMapping(value = "fee/fee_detail.html")
+    @RequestMapping(value = "fee/fee_detail")
     public String   detail( @RequestParam(value = "detail_id") Integer id, HttpSession session) {
         Cost cost = costService.findById(id);
         session.setAttribute("detail_id", cost);
